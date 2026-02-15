@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Town Voting System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border-bottom: 3px solid var(--secondary);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: slideDown 0.8s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .nav-brand i {
+            color: var(--secondary);
+            font-size: 2rem;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-weight: 500;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(52, 152, 219, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .nav-item:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .nav-item i {
+            font-size: 1.1rem;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover {
+            color: var(--secondary);
+        }
+        
+        .nav-item:hover i {
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+        
+        .nav-item.active {
+            background: var(--secondary);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+            }
+        }
+        
+        .nav-item.active i {
+            color: white;
+        }
+        
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0f7ff;
+            padding: 6px 16px 6px 12px;
+            border-radius: 40px;
+            margin-left: 10px;
+            animation: glow 3s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 10px 5px rgba(52, 152, 219, 0.2);
+            }
+        }
+        
+        .user-badge i {
+            color: var(--secondary);
+            animation: spin 10s linear infinite;
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #e2eaf2;
+            border-radius: 30px;
+            padding: 8px 18px;
+            color: var(--danger);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logout-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(231, 76, 60, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .logout-btn:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .logout-btn:hover {
+            background: #ffe9e9;
+            border-color: var(--danger);
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex: 1;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            animation: expandLine 1.5s ease-out;
+        }
+        
+        @keyframes expandLine {
+            from {
+                width: 0;
+            }
+            to {
+                width: 50px;
+            }
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-profile img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary) 0%, #2980b9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-left: 5px solid var(--secondary);
+            transition: all 0.5s;
+            animation: cardAppear 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes cardAppear {
+            from {
+                transform: translateY(50px) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(52,152,219,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card:nth-child(2) {
+            border-left-color: var(--success);
+        }
+        
+        .stat-card:nth-child(3) {
+            border-left-color: var(--warning);
+        }
+        
+        .stat-card:nth-child(4) {
+            border-left-color: var(--danger);
+        }
+        
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 15px 0 5px;
+            line-height: 1;
+            animation: countUp 2s ease-out;
+        }
+        
+        @keyframes countUp {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            animation: iconFloat 3s infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .icon-voters { 
+            background: linear-gradient(135deg, var(--secondary) 0%, #2980b9 100%);
+        }
+        
+        .icon-votes { 
+            background: linear-gradient(135deg, var(--success) 0%, #229954 100%);
+        }
+        
+        .icon-percentage { 
+            background: linear-gradient(135deg, var(--warning) 0%, #d68910 100%);
+        }
+        
+        .icon-leading { 
+            background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
+        }
+        
+        /* Dashboard Charts */
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.07);
+            margin-bottom: 25px;
+            border: 1px solid #eef2f7;
+            animation: slideIn 0.8s ease-out;
+            animation-fill-mode: both;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:nth-child(1) { animation-delay: 0.5s; }
+        .card:nth-child(2) { animation-delay: 0.6s; }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(52,152,219,0.05) 0%, transparent 70%);
+            transition: all 0.5s;
+        }
+        
+        .card:hover::after {
+            transform: scale(1.5);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f4f8;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .card-title::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: var(--secondary);
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            animation: badgePulse 2s infinite;
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .badge-success {
+            background-color: #d4f7e2;
+            color: #0a5c36;
+        }
+        
+        .badge-primary {
+            background-color: #d1e8ff;
+            color: #0a4b8c;
+        }
+        
+        .chart-container {
+            height: 320px;
+            margin-top: 20px;
+            animation: chartFade 1.5s ease-out;
+        }
+        
+        @keyframes chartFade {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Leading Candidate Card */
+        .leading-candidate-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            animation: glowPulse 3s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 8px 20px rgba(52, 152, 219, 0.2);
+            }
+            50% {
+                box-shadow: 0 8px 30px rgba(52, 152, 219, 0.4);
+            }
+        }
+        
+        .leading-candidate-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(52,152,219,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        .candidate-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary) 0%, #2980b9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+            animation: avatarFloat 3s infinite;
+        }
+        
+        @keyframes avatarFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-5px) rotate(5deg);
+            }
+        }
+        
+        .candidate-info h3 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 1.4rem;
+        }
+        
+        .candidate-info p {
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .candidate-votes {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #eef2f7;
+            animation: tableAppear 1s ease-out;
+        }
+        
+        @keyframes tableAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid #eef2f7;
+            transition: all 0.3s;
+        }
+        
+        .data-table th {
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .data-table tr {
+            transition: all 0.3s;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f0f9ff;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .data-table td {
+            position: relative;
+        }
+        
+        .data-table td::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--secondary);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+        
+        .data-table tr:hover td::before {
+            transform: scaleY(1);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #eef2f7;
+            color: var(--gray);
+            font-size: 0.9rem;
+            background: white;
+            animation: fadeIn 1.5s ease-out;
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .dashboard-container {
+                padding: 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading animation for charts */
+        .chart-loading {
+            position: relative;
+        }
+        
+        .chart-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-vote-yea"></i>
+            <span>Town<span style="color:var(--secondary);">Vote</span> 2026</span>
+        </div>
+        <div class="nav-links">
+            <a href="dashboard.html" class="nav-item active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="analysis.html" class="nav-item"><i class="fas fa-chart-bar"></i> Analysis</a>
+            <a href="village-view.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> Village</a>
+            <a href="reports.html" class="nav-item"><i class="fas fa-file-alt"></i> Reports</a>
+            <a href="candidate-registration.html" class="nav-item"><i class="fas fa-user-tie"></i> Candidate</a>
+            <a href="voter-registration.html" class="nav-item"><i class="fas fa-user-plus"></i> Voter</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+            
+            <div class="user-badge">
+                <i class="fas fa-user-circle"></i>
+                <span id="user-name-display">John Doe</span>
+            </div>
+            <button class="logout-btn" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="header">
+            <div>
+                <h1>Dashboard</h1>
+                <p id="page-subtitle">Election 2026 - Real-time Overview</p>
+            </div>
+            
+            <div class="user-profile">
+                <div id="user-avatar">JD</div>
+                <div>
+                    <p id="user-name">John Doe</p>
+                    <p id="user-role">Officer</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon icon-voters">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" id="total-voters">68,450</div>
+                <div class="stat-label">Total Registered Voters</div>
+                <div style="font-size: 0.9rem; color: #27ae60; margin-top: 5px;">
+                    <i class="fas fa-arrow-up"></i> 12.5% from last election
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon icon-votes">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <div class="stat-value" id="total-votes">45,230</div>
+                <div class="stat-label">Votes Cast (2026)</div>
+                <div style="font-size: 0.9rem; color: #27ae60; margin-top: 5px;">
+                    <i class="fas fa-check-circle"></i> 66.1% Turnout
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon icon-percentage">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-value" id="voting-percentage">66.1%</div>
+                <div class="stat-label">Current Turnout</div>
+                <div style="font-size: 0.9rem; color: #e74c3c; margin-top: 5px;">
+                    <i class="fas fa-arrow-down"></i> 2.6% from last election
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon icon-leading">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-value" id="leading-party">V. Kadam</div>
+                <div class="stat-label">Leading Candidate</div>
+                <div style="font-size: 0.9rem; color: #f39c12; margin-top: 5px;">
+                    33.7% of total votes
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-charts">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Voting Progress - Election Day 2026</h3>
+                    <span class="badge badge-primary">Live Data</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dashboardChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Top Candidates</h3>
+                    <span class="badge badge-success">Ranking</span>
+                </div>
+                <div class="leading-candidate-card">
+                    <div class="candidate-avatar">VK</div>
+                    <div class="candidate-info">
+                        <h3>Viswajeet Kadam</h3>
+                        <p>BJP • Islampur</p>
+                        <div class="candidate-votes">15,230</div>
+                        <div style="font-size: 0.9rem; color: #666;">33.7% of votes</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Candidate</th>
+                                    <th>Votes</th>
+                                    <th>%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Vishal Patil</td>
+                                    <td>12,450</td>
+                                    <td>27.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>Jayant Patil</td>
+                                    <td>8,920</td>
+                                    <td>19.7%</td>
+                                </tr>
+                                <tr>
+                                    <td>Sakshi Patil</td>
+                                    <td>5,680</td>
+                                    <td>12.6%</td>
+                                </tr>
+                                <tr>
+                                    <td>Rohit Jadhav</td>
+                                    <td>2,950</td>
+                                    <td>6.5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Town Voting Analysis System &copy; 2026 | Sangli District Municipal Elections</p>
+        <p>This is a demonstration system with sample data for 2026 elections</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user data from localStorage
+            const userData = JSON.parse(localStorage.getItem('currentUser'));
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Update user info
+            document.getElementById('user-name').textContent = userData.name;
+            document.getElementById('user-role').textContent = userData.role.charAt(0).toUpperCase() + userData.role.slice(1);
+            document.getElementById('user-avatar').textContent = userData.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('user-name-display').textContent = userData.name;
+            
+            // Logout button
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                // Add logout animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                }, 200);
+            });
+            
+            // Initialize chart with animation
+            setTimeout(() => {
+                initDashboardChart();
+            }, 500);
+        });
+        
+        function initDashboardChart() {
+            const ctx = document.getElementById('dashboardChart').getContext('2d');
+            
+            // Add loading animation
+            const chartContainer = document.querySelector('.chart-container');
+            chartContainer.classList.add('chart-loading');
+            
+            setTimeout(() => {
+                chartContainer.classList.remove('chart-loading');
+                
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['8:00 AM', '10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM'],
+                        datasets: [{
+                            label: 'Votes Cast (in thousands)',
+                            data: [8, 15, 22, 30, 38, 45.2],
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#3498db',
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            borderDash: [5, 5],
+                            animation: {
+                                duration: 2000,
+                                easing: 'easeInOutQuart'
+                            }
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Votes (in thousands)',
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time of Day (2026 Election)',
+                                    font: {
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeInOutQuart'
+                        }
+                    }
+                });
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

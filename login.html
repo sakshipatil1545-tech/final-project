@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Town Voting System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animated background */
+        .animated-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .bg-circle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+        
+        .bg-circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+        
+        .bg-circle:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            bottom: -200px;
+            right: -200px;
+            animation-delay: -5s;
+        }
+        
+        .bg-circle:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, 50px) scale(1.1);
+            }
+            50% {
+                transform: translate(0, 100px) scale(0.9);
+            }
+            75% {
+                transform: translate(-50px, 50px) scale(1.05);
+            }
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 2;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .back-to-home {
+            margin-bottom: 20px;
+        }
+        
+        .back-to-home a {
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            padding: 8px 16px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 30px;
+        }
+        
+        .back-to-home a:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateX(-5px);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--secondary) 0%, #2980b9 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .login-icon i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .login-header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .login-header p span {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            color: var(--gray);
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .input-with-icon .toggle-password {
+            left: auto;
+            right: 16px;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .input-with-icon .toggle-password:hover {
+            color: var(--secondary);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            border: 2px solid #e1e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #fcfdfe;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+            background-color: white;
+        }
+        
+        .form-control:focus + i {
+            color: var(--secondary);
+        }
+        
+        .role-selection {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .role-btn {
+            flex: 1;
+            padding: 14px;
+            background-color: #f8f9fa;
+            border: 2px solid #e1e8f0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .role-btn i {
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+        
+        .role-btn:hover {
+            background-color: #e8f4fc;
+            border-color: var(--secondary);
+        }
+        
+        .role-btn:hover i {
+            color: var(--secondary);
+        }
+        
+        .role-btn.active {
+            background: linear-gradient(135deg, var(--secondary) 0%, #2980b9 100%);
+            color: white;
+            border-color: var(--secondary);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .role-btn.active i {
+            color: white;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.7s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #2980b9 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(52, 152, 219, 0.6);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            background-color: #fee;
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid var(--danger);
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        .error-message i {
+            margin-right: 8px;
+        }
+        
+        .demo-credentials {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .demo-credentials p {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .demo-credentials p i {
+            color: var(--warning);
+        }
+        
+        .credential-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s;
+        }
+        
+        .credential-item:hover {
+            transform: translateX(5px);
+            border-color: var(--secondary);
+        }
+        
+        .credential-item i {
+            width: 20px;
+            color: var(--secondary);
+        }
+        
+        .credential-item .badge {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .footer i {
+            color: #ff6b6b;
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Loading spinner */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .btn-loading .btn-text {
+            visibility: hidden;
+        }
+        
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 25px;
+            }
+            
+            .role-selection {
+                flex-direction: column;
+            }
+            
+            .login-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="animated-bg">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Back to Home link -->
+            <div class="back-to-home">
+                <a href="index.html">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </div>
+
+            <!-- Login Header -->
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <h1>Welcome Back!</h1>
+                <p>Login to <span>Town Voting System 2026</span></p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" class="form-control" placeholder="Enter your username" required autocomplete="off">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password" required autocomplete="off">
+                        <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Role</label>
+                    <div class="role-selection">
+                        <div class="role-btn" data-role="admin">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </div>
+                        <div class="role-btn active" data-role="officer">
+                            <i class="fas fa-user-tie"></i> Officer
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="login-btn">
+                    <span class="btn-text">Login to Dashboard</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                </button>
+                
+                <div id="error-message" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i> 
+                    <span id="error-text">Invalid credentials. Please try again.</span>
+                </div>
+            </form>
+            
+            <!-- Demo Credentials -->
+            <div class="demo-credentials">
+                <p>
+                    <i class="fas fa-info-circle"></i>
+                    Demo Credentials
+                </p>
+                <div class="credential-item">
+                    <i class="fas fa-user-shield"></i>
+                    <strong>Admin:</strong> admin
+                    <span class="badge">admin123</span>
+                </div>
+                <div class="credential-item">
+                    <i class="fas fa-user-tie"></i>
+                    <strong>Officer:</strong> officer
+                    <span class="badge">officer123</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 Town Voting System | Sangli District Municipal Elections</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clear any existing user data on login page
+            localStorage.removeItem('currentUser');
+            
+            const loginForm = document.getElementById('login-form');
+            const errorMessage = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const loginBtn = document.getElementById('login-btn');
+            const roleButtons = document.querySelectorAll('.role-btn');
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            
+            let selectedRole = 'officer'; // Default role
+            
+            // Toggle password visibility
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+            
+            // Role selection
+            roleButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    roleButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedRole = this.dataset.role;
+                    
+                    // Update username placeholder based on role
+                    const usernameInput = document.getElementById('username');
+                    if (selectedRole === 'admin') {
+                        usernameInput.placeholder = 'Enter admin username';
+                    } else {
+                        usernameInput.placeholder = 'Enter officer username';
+                    }
+                });
+            });
+            
+            // Handle login
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                
+                // Validate inputs
+                if (!username || !password) {
+                    showError('Please enter both username and password');
+                    return;
+                }
+                
+                // Show loading state
+                loginBtn.classList.add('btn-loading');
+                loginBtn.disabled = true;
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    // Simple authentication for demo
+                    let isValid = false;
+                    let userData = null;
+                    
+                    if (selectedRole === 'admin') {
+                        isValid = (username === 'admin' && password === 'admin123');
+                        if (isValid) {
+                            userData = {
+                                username: 'admin',
+                                name: 'Admin User',
+                                role: 'admin',
+                                email: 'admin@townvote.gov',
+                                lastLogin: new Date().toISOString()
+                            };
+                        }
+                    } else if (selectedRole === 'officer') {
+                        isValid = (username === 'officer' && password === 'officer123');
+                        if (isValid) {
+                            userData = {
+                                username: 'officer',
+                                name: 'John Doe',
+                                role: 'officer',
+                                email: 'john.doe@townvote.gov',
+                                lastLogin: new Date().toISOString()
+                            };
+                        }
+                    }
+                    
+                    // Also allow any username with correct password format (for testing)
+                    if (!isValid && password === 'password123') {
+                        isValid = true;
+                        userData = {
+                            username: username,
+                            name: username.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1)).join(' '),
+                            role: selectedRole,
+                            email: username + '@townvote.gov',
+                            lastLogin: new Date().toISOString()
+                        };
+                    }
+                    
+                    if (isValid && userData) {
+                        // Store user data
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+                        
+                        // Show success message
+                        errorMessage.style.display = 'none';
+                        
+                        // Redirect to dashboard
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Show error
+                        showError('Invalid username or password for ' + selectedRole + ' role');
+                        
+                        // Reset button state
+                        loginBtn.classList.remove('btn-loading');
+                        loginBtn.disabled = false;
+                    }
+                }, 800); // Simulate network delay
+            });
+            
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.style.display = 'block';
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Add input event listeners to hide error when typing
+            document.getElementById('username').addEventListener('input', function() {
+                errorMessage.style.display = 'none';
+            });
+            
+            document.getElementById('password').addEventListener('input', function() {
+                errorMessage.style.display = 'none';
+            });
+            
+            // Pre-fill based on selected role (for demo convenience)
+            const usernameInput = document.getElementById('username');
+            const rolePrefill = {
+                admin: { username: 'admin', password: 'admin123' },
+                officer: { username: 'officer', password: 'officer123' }
+            };
+            
+            // Optional: Pre-fill when role changes (comment out if not wanted)
+            roleButtons.forEach(btn => {
+                btn.addEventListener('dblclick', function() {
+                    const role = this.dataset.role;
+                    const prefill = rolePrefill[role];
+                    if (prefill) {
+                        document.getElementById('username').value = prefill.username;
+                        document.getElementById('password').value = prefill.password;
+                    }
+                });
+            });
+            
+            // Add keyboard shortcut (Ctrl+1 for admin, Ctrl+2 for officer)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === '1') {
+                    e.preventDefault();
+                    roleButtons[0].click();
+                    document.getElementById('username').value = 'admin';
+                    document.getElementById('password').value = 'admin123';
+                } else if (e.ctrlKey && e.key === '2') {
+                    e.preventDefault();
+                    roleButtons[1].click();
+                    document.getElementById('username').value = 'officer';
+                    document.getElementById('password').value = 'officer123';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
